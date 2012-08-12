@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Ubuntu Jenkins initialization
+# ===
+# Usage: add to personality settings,
+# http://docs.rackspace.com/servers/api/v2/cs-devguide/content/CreateServers.html
+# personality/path: /etc/rc.local
+# personality/contents: 
+# wget -O /etc/rc.local.ubuntu-jenkins-init https://raw.github.com/huksley/rackspace-boot/master/ubuntu-jenkins-init.txt
+# chmod a+x /etc/rc.local.ubuntu-jenkins-init
+# /etc/rc.local.ubuntu-jenkins-init
+#
+
+wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add -
+sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list'
+aptitude -y update
+aptitude -y install jenkins
+
+
