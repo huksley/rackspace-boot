@@ -11,18 +11,17 @@ JAVA_CMD=/usr/bin/java
 GRAYLOG2_SERVER_HOME=/opt/graylog2-server
 
 start() {
-    echo Starting graylog2-server ...
-    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOMEgraylog2-server.jar /var/log/graylog2.log 2>&1 &
+    echo Starting graylog2-server 
+    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOME/graylog2-server.jar /var/log/graylog2.log 2>&1 &
 }
 
 stop() {
     PID=`cat /tmp/graylog2.pid`
-    echo Stopping graylog2-server ($PID) ...
+    echo Stopping graylog2-server $PID
     kill $PID
 }
 
 restart() {
-    echo Restarting graylog2-server ...
     stop
     start
 }
