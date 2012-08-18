@@ -5,4 +5,6 @@
 # wget -O graylog.install https://raw.github.com/huksley/rackspace-boot/master/ubuntu-graylog2-full.txt && source graylog.install
 
 
-echo hello
+if [ ! -d /opt/graylog2-server ]; do
+  mkdir -p /opt/graylog2-server
+fi
