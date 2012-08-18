@@ -12,7 +12,7 @@ GRAYLOG2_SERVER_HOME=/opt/graylog2-server
 
 start() {
     echo Starting graylog2-server 
-    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOME/graylog2-server.jar /var/log/graylog2.log 2>&1 &
+    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOME/graylog2-server.jar >/var/log/graylog2.log 2>&1 &
 }
 
 stop() {
