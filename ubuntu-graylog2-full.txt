@@ -4,4 +4,59 @@
 # ===
 # wget -O graylog.install https://raw.github.com/huksley/rackspace-boot/master/ubuntu-graylog2-full.txt && source graylog.install
 
+ver=0.9.6p1
+
+# prepare graylog
+
+if [ ! -d /opt ]; then
+  mkdir -p /opt
+fi
+
+cd /opt
+if [ ! -d /opt/graylog2-server-$ver ]; then
+  if [ ! -f graylog2-server-$ver.tar.gz ]; then
+    wget -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
+  fi
+
+  tar -xvf graylog2-server-$ver.tar.gz
+  rm graylog2-server
+  ln -s graylog2-server-$ver graylog2-server
+fi
+
+if [ ! -f /opt/graylog2-server/graylog2.conf ]; then
+  cp /opt/graylog2-server/graylog2.conf.example /opt/graylog2-server/graylog2.conf
+  ln -s /opt/graylog2-server/graylog2.conf /etc/graylog2.conf
+fi
+
+sed -i -e 's|mongodb_useauth = true|mongodb_useauth = false|' /opt/graylog2-server/graylog2.conf
+rm /etc/init.d/graylog2-server 
+ln -s /opt/graylog2-server/bin/graylog2ctl /etc/init.d/graylog2-server
+
+# elasticsearch
+apt-get update
+apt-get install unzip curl python-software-properties -y
+add-apt-repository ppa:ferramroberto/java
+apt-get update
+apt-get install sun-java6-jre sun-java6-plugin -y
+
+wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.2.tar.gz -O elasticsearch.tar.gz
+tar -xvf elasticsearch.tar.gz
+mv elasticsearch-* elasticsearch
+mv elasticsearch /opt/elasticsearch
+
+wget -O elasticsearch-servicewrapper.tar.gz http://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
+tar -xvf elasticsearch-servicewrapper.tar.gz
+mv *servicewrapper*/service /opt/elasticsearch/bin/
+rm -Rf *servicewrapper*
+sudo /opt/elasticsearch/bin/service/elasticsearch install
+ln -s `readlink -f /opt/elasticsearch/bin/service/elasticsearch` /usr/bin/elasticsearch_ctl
+sed -i -e 's|# cluster.name: elasticsearch|cluster.name: graylog2|' /opt/elasticsearch/config/elasticsearch.yml
+/etc/init.d/elasticsearch start
+curl -XGET 'http://localhost:9200/_cluster/health?pretty=true'
+
+# mongodb
+apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+echo deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen >> /etc/apt/sources.list
+apt-get install -y mongodb-10gen
+
 
