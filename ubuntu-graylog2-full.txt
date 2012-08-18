@@ -31,8 +31,26 @@ rm /etc/init.d/graylog2-server
 ln -s /opt/graylog2-server/bin/graylog2ctl /etc/init.d/graylog2-server
 
 # elasticsearch
-wget -O elasticsearch.sh https://raw.github.com/gist/1190526/eb03b9c8c19d3d6157655e3d51d015d69e8d74e2/es.sh
-sh elasticsearch.sh
+apt-get update
+apt-get install unzip curl python-software-properties -y
+add-apt-repository ppa:ferramroberto/java
+apt-get update
+apt-get install sun-java6-jre sun-java6-plugin -y
+
+wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.2.tar.gz -O elasticsearch.tar.gz
+tar -xvf elasticsearch.tar.gz
+mv elasticsearch-* elasticsearch
+mv elasticsearch /opt/elasticsearch
+
+wget -O elasticsearch-servicewrapper.tar.gz http://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
+tar -xvf elasticsearch-servicewrapper.tar.gz
+mv *servicewrapper*/service /opt/elasticsearch/bin/
+rm -Rf *servicewrapper*
+sudo /opt/elasticsearch/bin/service/elasticsearch install
+ln -s `readlink -f /opt/elasticsearch/bin/service/elasticsearch` /usr/bin/elasticsearch_ctl
+sed -i -e 's|# cluster.name: elasticsearch|cluster.name: graylog2|' /opt/elasticsearch/config/elasticsearch.yml
 /etc/init.d/elasticsearch start
+curl -XGET 'http://localhost:9200/_cluster/health?pretty=true'
+
 
 
