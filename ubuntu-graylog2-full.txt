@@ -5,3 +5,4 @@
 # wget -O graylog.install https://raw.github.com/huksley/rackspace-boot/master/ubuntu-graylog2-full.txt && source graylog.install
 
 
+echo hello
