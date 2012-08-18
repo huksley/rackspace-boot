@@ -6,6 +6,8 @@
 
 ver=0.9.6p1
 
+# prepare graylog
+
 if [ ! -d /opt ]; then
   mkdir -p /opt
 fi
@@ -21,3 +23,8 @@ if [ ! -d /opt/graylog2-server-$ver ]; then
   ln -s graylog2-server-$ver graylog2-server
 fi
 
+if [ ! -f /opt/graylog2-server/graylog2.conf ]; then
+  cp /opt/graylog2-server/graylog2.conf.example /opt/graylog2-server/graylog2.conf
+fi
+
+# elasticsearch & mongo
