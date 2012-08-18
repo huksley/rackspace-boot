@@ -10,4 +10,7 @@ if [ ! -d /opt/graylog2-server ]; then
   mkdir -p /opt/graylog2-server
 fi
 
-wget -O /opt/graylog2-server/ https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
+cd /opt/graylog2-server
+wget -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
+tar -xvf graylog2-server-$ver.tar.gz
+
