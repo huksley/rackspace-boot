@@ -80,7 +80,14 @@ bundle install
 
 gem install passenger
 apt-get -y install apache2 libcurl4-openssl-dev apache2-prefork-dev libapr1-dev libcurl4-openssl-dev apache2-prefork-dev libapr1-dev
-passenger-install-apache2-module
+echo yes | passenger-install-apache2-module
+
+cat >>/etc/apache2/apache2.conf <<EOF
+LoadModule passenger_module /usr/local/lib/ruby/gems/1.9.1/gems/passenger-3.0.15/ext/apache2/mod_passenger.so
+PassengerRoot /usr/local/lib/ruby/gems/1.9.1/gems/passenger-3.0.15
+PassengerRuby /usr/local/bin/ruby
+EOF
+
 service apache2 start
 service apache2 restart
 
