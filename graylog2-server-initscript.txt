@@ -36,7 +36,8 @@ case $CMD in
     restart)
         restart
         ;;
-    )
+    *)
     echo Usage $0 {start|stop|restart}
     RETVAL=1
 esac
+
