@@ -53,6 +53,7 @@ rm -Rf *servicewrapper*
 sudo /opt/elasticsearch/bin/service/elasticsearch install
 ln -s `readlink -f /opt/elasticsearch/bin/service/elasticsearch` /usr/bin/elasticsearch_ctl
 sed -i -e 's|# cluster.name: elasticsearch|cluster.name: graylog2|' /opt/elasticsearch/config/elasticsearch.yml
+sed -i -e 's|ES_HEAP_SIZE=1024|ES_HEAP_SIZE=128|' /opt/elasticsearch/bin/service/elasticsearch.conf
 /etc/init.d/elasticsearch start
 curl -XGET 'http://localhost:9200/_cluster/health?pretty=true'
 
