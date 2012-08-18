@@ -39,6 +39,7 @@ apt-get update
 apt-get install unzip curl python-software-properties -y
 add-apt-repository ppa:ferramroberto/java
 apt-get update
+echo sun-java6-jre shared/accepted-sun-dlj-v1-1 select true | /usr/bin/debconf-set-selections
 apt-get install sun-java6-jre sun-java6-plugin -y
 
 wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.2.tar.gz -O elasticsearch.tar.gz
