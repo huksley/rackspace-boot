@@ -7,24 +7,24 @@
 #
 CMD=$1
 NOHUP=`which nohup`
-JAVA_CMD=usrbinjava
-GRAYLOG2_SERVER_HOME=optgraylog2-server
+JAVA_CMD=/usr/bin/java
+GRAYLOG2_SERVER_HOME=/opt/graylog2-server
 
 start() {
     echo Starting graylog2-server ...
-    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOMEgraylog2-server.jar  varloggraylog2.log 2&1 &
+    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOMEgraylog2-server.jar /var/log/graylog2.log 2>&1 &
 }
 
 stop() {
-        PID=`cat tmpgraylog2.pid`
+    PID=`cat /tmp/graylog2.pid`
     echo Stopping graylog2-server ($PID) ...
-        kill $PID
+    kill $PID
 }
 
 restart() {
     echo Restarting graylog2-server ...
-        stop
-        start
+    stop
+    start
 }
 
 case $CMD in
@@ -38,6 +38,6 @@ case $CMD in
         restart
         ;;
     )
-        echo Usage $0 {startstoprestart}
-        RETVAL=1
+    echo Usage $0 {start|stop|restart}
+    RETVAL=1
 esac
