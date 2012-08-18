@@ -70,7 +70,7 @@ sudo sh ruby192.sh
 cd /opt
 wget -O graylog2-web-interface-$ver.tar.gz http://cloud.github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-$ver.tar.gz
 tar -xvf graylog2-web-interface-$ver.tar.gz
-ln -s graylog2-web-interface-0.9.6 graylog2-web-interface
+ln -s graylog2-web-interface-$ver graylog2-web-interface
 useradd graylog2 -d /opt/graylog2-web-interface
 chown -R graylog2:graylog2 /opt/graylog2-web-interface*
 usermod -G admin graylog2
