@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# graylog2-server   graylog2 message collector
+#
+# chkconfig - 98 02
+# description  This daemon listens for syslog and GELF messages and stores them in mongodb
+#
+CMD=$1
+NOHUP=`which nohup`
+JAVA_CMD=usrbinjava
+GRAYLOG2_SERVER_HOME=optgraylog2-server
+
+start() {
+    echo Starting graylog2-server ...
+    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOMEgraylog2-server.jar  varloggraylog2.log 2&1 &
+}
+
+stop() {
+        PID=`cat tmpgraylog2.pid`
+    echo Stopping graylog2-server ($PID) ...
+        kill $PID
+}
+
+restart() {
+    echo Restarting graylog2-server ...
+        stop
+        start
+}
+
+case $CMD in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    )
+        echo Usage $0 {startstoprestart}
+        RETVAL=1
+esac
