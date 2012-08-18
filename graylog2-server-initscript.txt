@@ -1,9 +1,9 @@
 #!/bin/sh
 #
-# graylog2-server   graylog2 message collector
+# graylog2-server:   graylog2 message collector
 #
-# chkconfig - 98 02
-# description  This daemon listens for syslog and GELF messages and stores them in mongodb
+# chkconfig: - 98 02
+# description:  This daemon listens for syslog and GELF messages and stores them in mongodb
 #
 CMD=$1
 NOHUP=`which nohup`
@@ -11,22 +11,23 @@ JAVA_CMD=/usr/bin/java
 GRAYLOG2_SERVER_HOME=/opt/graylog2-server
 
 start() {
-    echo Starting graylog2-server 
-    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOME/graylog2-server.jar >/var/log/graylog2.log 2>&1 &
+    echo "Starting graylog2-server ..."
+    $NOHUP $JAVA_CMD -jar $GRAYLOG2_SERVER_HOME/graylog2-server.jar > /var/log/graylog2.log 2>&1 &
 }
 
 stop() {
-    PID=`cat /tmp/graylog2.pid`
-    echo Stopping graylog2-server $PID
-    kill $PID
+        PID=`cat /tmp/graylog2.pid`
+    echo "Stopping graylog2-server ($PID) ..."
+        kill $PID
 }
 
 restart() {
-    stop
-    start
+    echo "Restarting graylog2-server ..."
+        stop
+        start
 }
 
-case $CMD in
+case "$CMD" in
     start)
         start
         ;;
@@ -37,7 +38,6 @@ case $CMD in
         restart
         ;;
     *)
-    echo Usage $0 {start|stop|restart}
-    RETVAL=1
+        echo "Usage $0 {start|stop|restart}"
+        RETVAL=1
 esac
-
