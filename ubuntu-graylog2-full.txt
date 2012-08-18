@@ -62,3 +62,25 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
 echo deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen >> /etc/apt/sources.list
 apt-get update
 apt-get install -y mongodb-10gen
+
+# ruby!
+wget -O ruby192.sh https://raw.github.com/deanperry/onelineserver/master/ruby/192.sh
+sudo sh ruby192.sh
+
+cd /opt
+wget -O graylog2-web-interface-$ver.tar.gz http://cloud.github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-$ver.tar.gz
+tar -xvf graylog2-web-interface-$ver.tar.gz
+ln -s graylog2-web-interface-0.9.6 graylog2-web-interface
+useradd graylog2 -d /opt/graylog2-web-interface
+chown -R graylog2:graylog2 /opt/graylog2-web-interface*
+usermod -G admin graylog2
+cd /opt/graylog2-web-interface
+gem install bundler --no-ri --no-rdoc
+bundle install
+
+gem install passenger
+apt-get -y install apache2 libcurl4-openssl-dev apache2-prefork-dev libapr1-dev libcurl4-openssl-dev apache2-prefork-dev libapr1-dev
+passenger-install-apache2-module
+service apache2 start
+service apache2 restart
+
