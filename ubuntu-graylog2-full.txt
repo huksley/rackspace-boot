@@ -18,6 +18,6 @@ if [ ! -d /opt/graylog2-server-$ver ]; then
 
   tar -xvf graylog2-server-$ver.tar.gz
   rm graylog2-server
-  ln -s graylog2-server graylog2-server-$ver
+  ln -s graylog2-server-$ver graylog2-server
 fi
 
