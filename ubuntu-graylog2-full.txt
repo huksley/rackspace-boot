@@ -6,11 +6,18 @@
 
 ver=0.9.6p1
 
-if [ ! -d /opt/graylog2-server ]; then
-  mkdir -p /opt/graylog2-server
+if [ ! -d /opt ]; then
+  mkdir -p /opt
 fi
 
-cd /opt/graylog2-server
-wget -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
-tar -xvf graylog2-server-$ver.tar.gz
+cd /opt
+if [ ! -d /opt/graylog2-server-$ver ]; then
+  if [ ! -f graylog2-server-$ver.tar.gz ]; then
+    wget -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
+  fi
+
+  tar -xvf graylog2-server-$ver.tar.gz
+  rm graylog2-server
+  ln -s graylog2-server graylog2-server-$ver
+fi
 
