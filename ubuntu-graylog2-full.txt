@@ -27,4 +27,12 @@ if [ ! -f /opt/graylog2-server/graylog2.conf ]; then
   cp /opt/graylog2-server/graylog2.conf.example /opt/graylog2-server/graylog2.conf
 fi
 
-# elasticsearch & mongo
+rm /etc/init.d/graylog2-server 
+ln -s /opt/graylog2-server/bin/graylog2ctl /etc/init.d/graylog2-server
+
+# elasticsearch
+wget -O elasticsearch.sh https://raw.github.com/gist/1190526/eb03b9c8c19d3d6157655e3d51d015d69e8d74e2/es.sh
+sh elasticsearch.sh
+/etc/init.d/elasticsearch start
+
+
