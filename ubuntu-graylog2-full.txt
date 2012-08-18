@@ -4,7 +4,10 @@
 # ===
 # wget -O graylog.install https://raw.github.com/huksley/rackspace-boot/master/ubuntu-graylog2-full.txt && source graylog.install
 
+ver=0.9.6p1
 
-if [ ! -d /opt/graylog2-server ]; do
+if [ ! -d /opt/graylog2-server ]; then
   mkdir -p /opt/graylog2-server
 fi
+
+wget -O /opt/graylog2-server/ https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
