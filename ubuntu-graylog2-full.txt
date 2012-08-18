@@ -42,7 +42,7 @@ apt-get update
 echo sun-java6-jre shared/accepted-sun-dlj-v1-1 select true | /usr/bin/debconf-set-selections
 apt-get install sun-java6-jre sun-java6-plugin -y
 
-wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.2.tar.gz -O elasticsearch.tar.gz
+wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.8.tar.gz -O elasticsearch.tar.gz
 tar -xvf elasticsearch.tar.gz
 mv elasticsearch-* elasticsearch
 mv elasticsearch /opt/elasticsearch
