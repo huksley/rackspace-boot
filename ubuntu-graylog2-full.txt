@@ -84,3 +84,29 @@ passenger-install-apache2-module
 service apache2 start
 service apache2 restart
 
+
+cat >/etc/apache2/sites-available/graylog2 <<EOF
+<VirtualHost *:80>
+  ServerName graylog2
+	ServerAlias graylog2
+	DocumentRoot /opt/graylog2-web-interface/public
+	
+	<Directory /opt/graylog2-web-interface/public>
+		Allow from all
+		Options -MultiViews
+	</Directory>
+	
+	ErrorLog /var/log/apache2/error.log
+	LogLevel warn
+	CustomLog /var/log/apache2/access.log combined
+</VirtualHost>
+EOF
+
+a2ensite graylog2
+service apache2 restart
+cat >/etc/rsyslog.d/graylog2.conf <<EOF
+*.*     @127.0.0.1  #udp forwarding
+EOF
+
+service rsyslog restart
+
