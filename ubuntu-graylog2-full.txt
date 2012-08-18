@@ -119,4 +119,5 @@ cat >/etc/rsyslog.d/graylog2.conf <<EOF
 EOF
 
 service rsyslog restart
-
+update-rc.d graylog2-server enable
+update-rc.d elasticsearch enable
