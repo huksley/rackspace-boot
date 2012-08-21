@@ -16,15 +16,15 @@ start() {
 }
 
 stop() {
-        PID=`cat /tmp/graylog2.pid`
-    echo "Stopping graylog2-server ($PID) ..."
-        kill $PID
+	PID=`cat /tmp/graylog2.pid`
+	echo "Stopping graylog2-server () ..."
+	kill $PID 2>/dev/null 1>/dev/null
 }
 
 restart() {
-    echo "Restarting graylog2-server ..."
-        stop
-        start
+	echo "Restarting graylog2-server ..."
+	stop
+    start
 }
 
 case "$CMD" in
@@ -38,6 +38,6 @@ case "$CMD" in
         restart
         ;;
     *)
-        echo "Usage $0 {start|stop|restart}"
-        RETVAL=1
+	echo "Usage $0 {start|stop|restart}"
+    RETVAL=1
 esac
