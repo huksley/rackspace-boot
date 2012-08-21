@@ -6,6 +6,14 @@
 
 ver=0.9.6p1
 
+# proxy magic if you set http_proxy 
+gemproxy=""
+wgetproxy=""
+if [ "$http_proxy" != "" ]; then
+	wgetproxy="-Y on"
+	gemproxy="--http-proxy $http_proxy"
+fi
+
 # prepare graylog
 
 if [ ! -d /opt ]; then
@@ -15,7 +23,7 @@ fi
 cd /opt
 if [ ! -d /opt/graylog2-server-$ver ]; then
   if [ ! -f graylog2-server-$ver.tar.gz ]; then
-    wget -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
+    wget $wgetproxy -O graylog2-server-$ver.tar.gz https://github.com/downloads/Graylog2/graylog2-server/graylog2-server-$ver.tar.gz
   fi
 
   tar -xvf graylog2-server-$ver.tar.gz
@@ -30,9 +38,54 @@ fi
 
 sed -i -e 's|mongodb_useauth = true|mongodb_useauth = false|' /opt/graylog2-server/graylog2.conf
 rm /etc/init.d/graylog2-server 
-wget -O /etc/init.d/graylog2-server https://raw.github.com/huksley/rackspace-boot/master/graylog2-server-initscript.txt
+#wget $wgetproxy -O /etc/init.d/graylog2-server https://raw.github.com/huksley/rackspace-boot/master/graylog2-server-initscript.txt
+cat >>/etc/init.d/graylog2-server <<EOF
+#!/bin/sh
+#
+# graylog2-server:   graylog2 message collector
+#
+# chkconfig: - 98 02
+# description:  This daemon listens for syslog and GELF messages and stores them in mongodb
+#
+CMD=\$1
+NOHUP=\`which nohup\`
+JAVA_CMD=/usr/bin/java
+GRAYLOG2_SERVER_HOME=/opt/graylog2-server
+
+start() {
+    echo "Starting graylog2-server ..."
+    \$NOHUP \$JAVA_CMD -jar \$GRAYLOG2_SERVER_HOME/graylog2-server.jar > /var/log/graylog2.log 2>&1 &
+}
+
+stop() {
+	PID=\`cat /tmp/graylog2.pid\`
+	echo "Stopping graylog2-server ($PID) ..."
+	kill \$PID 2>/dev/null 1>/dev/null
+}
+
+restart() {
+	echo "Restarting graylog2-server ..."
+	stop
+    start
+}
+
+case "\$CMD" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+	echo "Usage \$0 {start|stop|restart}"
+    RETVAL=1
+esac
+EOF
 chmod a+x /etc/init.d/graylog2-server
-update-rc.d graylog2-server defaults
+update-rc.d graylog2-server enable
 
 # elasticsearch
 apt-get update
@@ -42,20 +95,21 @@ apt-get update
 echo sun-java6-jre shared/accepted-sun-dlj-v1-1 select true | /usr/bin/debconf-set-selections
 apt-get install sun-java6-jre sun-java6-plugin -y
 
-wget https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.8.tar.gz -O elasticsearch.tar.gz
+wget $wgetproxy https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-0.19.8.tar.gz -O elasticsearch.tar.gz
 tar -xvf elasticsearch.tar.gz
 mv elasticsearch-* elasticsearch
 mv elasticsearch /opt/elasticsearch
 
-wget -O elasticsearch-servicewrapper.tar.gz http://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
+wget $wgetproxy -O elasticsearch-servicewrapper.tar.gz http://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master
 tar -xvf elasticsearch-servicewrapper.tar.gz
 mv *servicewrapper*/service /opt/elasticsearch/bin/
 rm -Rf *servicewrapper*
 sudo /opt/elasticsearch/bin/service/elasticsearch install
 ln -s `readlink -f /opt/elasticsearch/bin/service/elasticsearch` /usr/bin/elasticsearch_ctl
 sed -i -e 's|# cluster.name: elasticsearch|cluster.name: graylog2|' /opt/elasticsearch/config/elasticsearch.yml
+# FIXME: set maximum heap size
 sed -i -e 's|ES_HEAP_SIZE=1024|ES_HEAP_SIZE=128|' /opt/elasticsearch/bin/service/elasticsearch.conf
-/etc/init.d/elasticsearch start
+service elasticsearch start
 curl -XGET 'http://localhost:9200/_cluster/health?pretty=true'
 
 # mongodb
@@ -63,23 +117,27 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
 echo deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen >> /etc/apt/sources.list
 apt-get update
 apt-get install -y mongodb-10gen
+service mongodb start
+
+# start graylog2-server now
+service graylog2-server start
 
 # ruby!
-wget -O ruby192.sh https://raw.github.com/deanperry/onelineserver/master/ruby/192.sh
+wget $wgetproxy -O ruby192.sh https://raw.github.com/deanperry/onelineserver/master/ruby/192.sh
 sudo sh ruby192.sh
 
 cd /opt
-wget -O graylog2-web-interface-$ver.tar.gz http://cloud.github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-$ver.tar.gz
+wget $wgetproxy -O graylog2-web-interface-$ver.tar.gz http://cloud.github.com/downloads/Graylog2/graylog2-web-interface/graylog2-web-interface-$ver.tar.gz
 tar -xvf graylog2-web-interface-$ver.tar.gz
 ln -s graylog2-web-interface-$ver graylog2-web-interface
 useradd graylog2 -d /opt/graylog2-web-interface
 chown -R graylog2:graylog2 /opt/graylog2-web-interface*
-usermod -G admin graylog2
+usermod -G sudo graylog2
 cd /opt/graylog2-web-interface
-gem install bundler --no-ri --no-rdoc
+gem install $gemproxy bundler --no-ri --no-rdoc
 bundle install
 
-gem install passenger
+gem install $gemproxy passenger
 apt-get -y install apache2 libcurl4-openssl-dev apache2-prefork-dev libapr1-dev libcurl4-openssl-dev apache2-prefork-dev libapr1-dev
 echo yes | passenger-install-apache2-module
 
@@ -91,7 +149,6 @@ EOF
 
 service apache2 start
 service apache2 restart
-
 
 cat >/etc/apache2/sites-available/graylog2 <<EOF
 <VirtualHost *:80>
@@ -122,3 +179,4 @@ EOF
 service rsyslog restart
 update-rc.d graylog2-server enable
 update-rc.d elasticsearch enable
+#shutdown -r now
